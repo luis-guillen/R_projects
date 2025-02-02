@@ -1,0 +1,619 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+
+```{r}
+##cargamos paquetes a usar
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(scales)
+```
+
+```{r}
+##Leemos dataframe
+cv19<-read.csv("cv19_municipio-residencia_casos.csv")
+cv19
+```
+5. En las «olas», ¿se nota algún efecto rebote cuando se ha levantado alguna restricción o
+tras algún periodo festivo? Por ejemplo, cuando finalizó el primer gran confinamiento,
+¿se produce una ola a continuación? ¿O después de los puentes, Navidad o Semana
+Santa?
+
+```{r}
+##Columnas a utilizar
+cv19olas <- cv19[, c(2,3,6)]
+##Pasamos fecha a formato date
+cv19olas$fecha_caso <- as.Date(cv19olas$fecha_caso, format("%d/%m/%Y"))
+##Comprobamos NAs
+cv19olas <- cv19olas[!is.na(cv19olas$fecha_caso),]
+cv19olas <- cv19olas[!is.na(cv19olas$municipio),]
+
+data <-cv19olas
+data
+```
+
+Navidad en las islas 2021
+```{r}
+###Definimos intervalo
+dia = "2021-12-24"
+inicio = "2021-12-01"
+final = "2022-01-01"
+
+df <- data
+##Aplicamos
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+##Ploteamos el gráfico con ggplot2
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#81db74") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "goldenrod", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933"))+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Nochebuena 2021, 24 Diciembre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+
+Día de la hispanidad y puente 2021
+```{r}
+###Definimos intervalo
+dia = "2021-10-12"
+inicio = "2021-10-01"
+final = "2021-11-01"
+
+df <- data
+##Aplicamos
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+##Ploteamos el gráfico con ggplot2
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#ff6961") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "goldenrod", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933"))+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Día de la Hispanidad 2021, 12 Octubre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+
+
+
+Fin de mascarillas en exteriores en Canarias
+```{r}
+###Definimos intervalo
+dia = "2022-02-9"
+inicio = "2022-02-01"
+final = "2022-03-01"
+
+df <- data
+##Aplicamos
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+##Ploteamos el gráfico con ggplot2
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#5d9b9b") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "orange", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933"))+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fin de mascarillas en exteriores, 9 de febrero")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+
+
+
+
+Semana Santa 2021
+```{r}
+###Definimos intervalo
+dia = "2021-04-10"
+inicio = "2021-04-01"
+final = "2021-05-01"
+
+df <- data
+##Aplicamos
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+##Ploteamos el gráfico con ggplot2
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#a18594") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "goldenrod", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Inicio de Semana Santa 2021, 10 de abril")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+
+
+
+
+Verano sin mascarillas 2021 + día de fin de uso
+```{r}
+###Definimos intervalo
+dia = "2021-06-26"
+inicio = "2021-06-01"
+final = "2021-09-01"
+
+df <- data
+##Aplicamos
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+##Ploteamos el gráfico con ggplot2
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FFA07A") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "goldenrod", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Verano sin mascarillas 2021, 26 de junio (fin de obligatoriedad)")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+
+
+
+Segunda tarea
+```{r}
+data <- read.csv("cv19_municipio-residencia_casos.csv",header = TRUE)
+data = data[, -c(1,4,5,7,8,9) ]
+data$fecha_caso <- as.Date(data$fecha_caso, format("%d/%m/%Y"))
+
+data <- data[!is.na(data$fecha_caso),]
+data <- data[!is.na(data$municipio),]
+
+data
+```
+
+Virgen de los Reyes en el Hierro, 24 Septiembre
+
+```{r}
+dia = "2021-09-24"
+isla = "EL HIERRO"
+inicio = "2021-09-01"
+final = "2021-10-01"
+df <- data
+df <- df[df$isla == isla,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=2), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Virgen de los Reyes en el Hierro, 24 Septiembre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Los indianos en Santa Cruz de La Palma, primer lunes de Carnaval, en 2022, 28 Febrero
+
+```{r}
+dia = "2022-02-28"
+municipio = "Santa Cruz de La Palma"
+inicio = "2022-02-15"
+final = "2022-03-15"
+df <- data
+df <- df[df$municipio == municipio,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=24), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 35, by= 2), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Los indianos en Santa Cruz de La Palma, 28 Febrero")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Fiesta de  Virgen del Carmen en Vallehermoso, La Gomera, 16 de Julio
+
+```{r}
+dia = "2021-07-16"
+municipio = "Vallehermoso"
+inicio = "2021-07-01"
+final = "2021-08-01"
+df <- data
+df <- df[df$municipio == municipio,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=1), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 4, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiesta de  Virgen del Carmen en Vallehermoso, La Gomera, 16 de Julio")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Observamos en la isla completa
+
+```{r}
+dia = "2021-07-16"
+isla = "LA GOMERA"
+inicio = "2021-07-01"
+final = "2021-08-01"
+df <- data
+df <- df[df$isla == isla,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=10), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 30, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiesta de  Virgen del Carmen en Vallehermoso, La Gomera, 16 de Julio")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Fiesta de la Candelaria en Candelaria, Tenerife, el 14 de Agosto
+
+```{r}
+dia = "2021-08-14"
+municipio = "Candelaria"
+inicio = "2021-07-25"
+final = "2021-09-01"
+df <- data
+df <- df[df$municipio == municipio,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=20), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 30, by= 2), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiesta de la Candelaria en Candelaria, Tenerife, el 14 de Agosto")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Romería de San Isidro Labrador en La Orotava, Tenerife, en los meses de Mayo Junio
+
+```{r}
+municipio = "La Orotava"
+inicio = "2021-04-25"
+final = "2021-07-10"
+df <- data
+df <- df[df$municipio == municipio,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  scale_x_date(breaks = date_breaks("1 weeks"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 30, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Romería de San Isidro Labrador en La Orotava, Tenerife, en los meses de Mayo-Junio")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Fiesta del Pino en Teror, Gran Canaria, día 8 de Septiembre
+
+```{r}
+dia = "2021-09-08"
+municipio = "Teror"
+inicio = "2021-08-15"
+final = "2021-09-30"
+df <- data
+df <- df[df$municipio == municipio,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=1), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiesta del Pino en Teror, Gran Canaria, día 8 de Septiembre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+
+```
+
+Observamos en la isla completa
+
+```{r}
+dia = "2021-09-08"
+isla = "GRAN CANARIA"
+inicio = "2021-08-15"
+final = "2021-09-30"
+df <- data
+df <- df[df$isla == isla,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=90), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 300, by= 10), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiesta del Pino en Teror, Gran Canaria, día 8 de Septiembre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Fiesta de la Rama en Agaete, Gran Canaria, día 5 de Agosto
+
+```{r}
+dia = "2021-08-05"
+municipio = "Agaete"
+inicio = "2021-07-25"
+final = "2021-09-01"
+df <- data
+df <- df[df$municipio == municipio,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=1), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 5, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiesta de la Rama en Agaete, Gran Canaria, día 5 de Agosto")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+
+```
+
+Observamos en la isla completa
+
+```{r}
+dia = "2021-08-05"
+isla = "GRAN CANARIA"
+inicio = "2021-07-25"
+final = "2021-09-01"
+df <- data
+df <- df[df$isla == isla,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=320), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 500, by= 20), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiesta de la Rama en Agaete, Gran Canaria, día 5 de Agosto")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Fiestas Virgen de la Peña en Bentancuria, Fuerteventura, 18 Septiembre, no hay datos de Bentancuria, por lo que observamos en la isla entera
+
+```{r}
+dia = "2021-09-18"
+isla = "FUERTEVENTURA"
+inicio = "2021-09-01"
+final = "2021-10-01"
+df <- data
+df <- df[df$isla == isla,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=20), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 30, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Fiestas Virgen de la Peña en Bentancuria, Fuerteventura, 18 Septiembre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Romería de Los Dolores en Mancha Blanca, Lanzarote, 15 Septiembre
+
+```{r}
+dia = "2021-09-15"
+municipio = "Tinajo"
+inicio = "2021-09-01"
+final = "2021-10-01"
+df <- data
+df <- df[df$municipio == municipio,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=0.5), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 4, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Romería de Los Dolores en Mancha Blanca, Lanzarote, 15 Septiembre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+Observamos en la isla completa
+
+```{r}
+dia = "2021-09-15"
+isla = "LANZAROTE"
+inicio = "2021-09-01"
+final = "2021-10-01"
+df <- data
+df <- df[df$isla == isla,]
+
+df <- df[df$fecha_caso > inicio,]
+df <- df[df$fecha_caso < final,]
+
+x= as.numeric(ymd(dia))
+y = as.Date(dia)
+
+ggplot(df, aes(x=fecha_caso), color="black") + 
+  geom_bar( stat="count", fill = "#FF6666") +
+  geom_vline(xintercept=x, linetype="dashed", 
+             color = "blue", size=1.5)+
+  scale_fill_manual(name = '', guide = 'legend',
+                    values = c( "#00ffff","#009933")) +
+  geom_text(aes(x=y, label="Día de fiesta", y=15), colour="blue",vjust=1.5, angle=90)+
+  scale_x_date(breaks = date_breaks("1 day"), labels = date_format("%Y-%m-%d"))+
+  scale_y_continuous(seq(0, 30, by= 1), name = "Número de casos")+
+  theme(legend.position='bottom') + 
+  labs(x = "Día")+
+  ggtitle("Romería de Los Dolores en Mancha Blanca, Lanzarote, 15 Septiembre")+
+  theme( axis.text.x = element_text(angle = 90, hjust = 1, size =5))
+```
+
+
