@@ -1,5 +1,5 @@
 # R_projects
-A repertoire of various projects from last term.
+Un repertorio de proyectos hechos en el último cuatrimestre.
 
 # Análisis de Efectos de Restricciones y Periodos Festivos en la Incidencia de COVID-19 en Canarias
 
