@@ -1,0 +1,252 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+  word_document: default
+---
+Primera tarea
+
+
+```{r}
+library(tidyverse)
+library(sf)
+library(broom)
+library(ggplot2)
+library(dplyr)
+library(readxl)
+```
+
+
+```{r}
+# Cargar shapefile de Comunidades Autónomas
+shapefile_ccaa <- st_read("Comunidades_Autonomas_ETRS89_30N.shp")
+
+# Convertir a dataframe con coordenadas y asegurar que id es de tipo character
+data_ccaa <- shapefile_ccaa %>%
+  mutate(id = as.character(row_number())) %>%
+  st_as_sf()
+
+# Revisar primeras observaciones
+head(data_ccaa)
+
+# Extraer nombres de comunidades
+nombres_ccaa <- data.frame(Nombre = shapefile_ccaa$Texto)
+nombres_ccaa$id <- as.character(seq(1, nrow(nombres_ccaa)))
+
+# Unir datos geográficos con nombres (ahora ambos id son character)
+data_ccaa_mapa <- left_join(data_ccaa, nombres_ccaa, by = "id")
+
+# Mostrar el resultado
+head(data_ccaa_mapa)
+
+# Extraer nombres
+nombres_ccaa <- data.frame(Nombre = shapefile_ccaa$Texto)
+nombres_ccaa$id <- as.character(seq(1, nrow(nombres_ccaa)))
+
+# Unir datos geográficos con nombres
+data_ccaa_mapa <- left_join(data_ccaa, nombres_ccaa, by = "id")
+
+# Mapa con ggplot
+ggplot(data_ccaa_mapa) +
+  geom_sf(aes(fill = Nombre), color = "white") +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    panel.background = element_rect(colour= "darkgrey", size= 0.5)) +
+  ggtitle("Comunidades Autónomas Españolas")
+```
+
+
+Provincias españolas
+
+```{r}
+# Cargar shapefile de Provincias
+shapefile_provincias <- st_read("Provincias_ETRS89_30N.shp")
+
+# Verificar los nombres de las columnas
+print(colnames(shapefile_provincias)) 
+
+# Extraer nombres de provincias usando `texto` en lugar de `Texto`
+if ("texto" %in% colnames(shapefile_provincias)) {
+  nombres_provincias <- data.frame(Nombre = shapefile_provincias$texto)
+} else {
+  stop("Error: No se encontró la columna `texto` en `shapefile_provincias`.")
+}
+
+# Verificar que `nombres_provincias` no esté vacío antes de asignar `id`
+if(nrow(nombres_provincias) > 0) {
+  nombres_provincias$id <- as.character(seq(1, nrow(nombres_provincias)))
+} else {
+  stop("Error: `nombres_provincias` está vacío, revisa el contenido de `shapefile_provincias`.")
+}
+
+# Convertir shapefile a dataframe y asegurarse de que `id` sea de tipo character
+data_provincias <- shapefile_provincias %>%
+  mutate(id = as.character(row_number())) %>%
+  st_as_sf()
+
+# Unir los datos geográficos con los nombres
+data_provincias_mapa <- left_join(data_provincias, nombres_provincias, by = "id")
+
+# Revisar el resultado final
+head(data_provincias_mapa)
+
+# Unir datos geográficos con nombres
+data_provincias_mapa <- left_join(data_provincias, nombres_provincias, by = "id")
+
+# Mapa de provincias
+ggplot(data_provincias_mapa) +
+  geom_sf(aes(fill = Nombre), color = "white") +
+  theme_minimal() +
+  ggtitle("Provincias Españolas")
+```
+
+Municipios Españoles
+```{r}
+# Cargar el shapefile de municipios de España
+shapefile_municipios <- st_read("Municipios_IGN.shp")
+
+# Asegurar que el ID es de tipo character
+shapefile_municipios <- shapefile_municipios %>%
+  mutate(id = as.character(row_number()))
+
+# Extraer los códigos INE de los municipios
+if ("CODIGOINE" %in% colnames(shapefile_municipios)) {
+  codigo_municipios <- data.frame(codigo_ine = shapefile_municipios$CODIGOINE)
+} else {
+  stop("Error: No se encontró la columna `CODIGOINE` en `shapefile_municipios`.")
+}
+
+# Asegurar que el ID en `codigo_municipios` es character
+codigo_municipios$id <- as.character(seq(1, nrow(codigo_municipios)))
+
+# Unir los datos espaciales con los códigos INE
+data_municipios_mapa <- left_join(shapefile_municipios, codigo_municipios, by = "id")
+
+# Revisar el resultado final
+head(data_municipios_mapa)
+
+# Mapa de los Municipios de España
+ggplot(data_municipios_mapa) +
+  geom_sf(fill = "violetred4", color = "white", size = 0.05) +
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    axis.ticks = element_blank(),
+    panel.background = element_rect(colour= "darkgrey", size= 0.5)
+  ) +
+  ggtitle("Municipios Españoles")
+```
+
+
+Mapa del porcentaje de Riesgo de Pobreza por Comunidad Autónoma
+
+```{r}
+# Cargar dataset de riesgo de pobreza
+riesgo_pobreza <- read_excel("riesgo_pobreza.xlsx")
+
+# Asegurar que el ID es de tipo caracter
+riesgo_pobreza$id <- as.character(riesgo_pobreza$id)
+
+# Unir con los datos de comunidades autónomas
+riesgo_pobreza_grafico <- left_join(data_ccaa_mapa, riesgo_pobreza, by= "id")
+
+# Crear el mapa
+ggplot(riesgo_pobreza_grafico) +
+  geom_sf(aes(fill = Riesgo_pobreza), color= "white", size = 0.2) +
+  scale_fill_gradient(low = "yellow", high = "red") +
+  labs(
+    title = "Tasa de Riesgo de Pobreza por Comunidades Autónomas",
+    subtitle = "Unidades: Porcentaje",
+    caption = "Fuente: INE",
+    fill = "Tasa (%)") +
+  theme_minimal()
+```
+
+
+Mapa de municipios de Canarias con ggplot
+
+```{r}
+# Cargar shapefile de municipios de Canarias
+shapefile_muncan <- st_read("municipios.shp")
+
+# Convertir a dataframe con coordenadas y asegurar que `id` es character
+data_muncan <- shapefile_muncan %>%
+  mutate(id = as.character(row_number())) %>%
+  st_as_sf()
+
+# Verificar el contenido del shapefile y los nombres de las columnas
+print(colnames(shapefile_muncan))
+
+# Extraer nombres de municipios asegurando que `id` sea character
+if ("municipio" %in% colnames(shapefile_muncan)) {
+  nombres_muncan <- data.frame(Nombre = shapefile_muncan$municipio)
+} else {
+  stop("Error: No se encontró la columna `municipio` en `shapefile_muncan`.")
+}
+
+# Asegurar que `id` en `nombres_muncan` es character antes de la unión
+if(nrow(nombres_muncan) > 0) {
+  nombres_muncan$id <- as.character(seq(1, nrow(nombres_muncan)))
+} else {
+  stop("Error: `nombres_muncan` está vacío, revisa el contenido de `shapefile_muncan`.")
+}
+
+# Unir datos geográficos con nombres
+data_muncan_mapa <- left_join(data_muncan, nombres_muncan, by = "id")
+
+# Revisar el resultado final
+head(data_muncan_mapa)
+
+# Mapa de municipios de Canarias
+ggplot(data_muncan_mapa) +
+  geom_sf(fill = "gold", color = "white", size = 0.05) +
+  theme_minimal() +
+  ggtitle("Municipios Canarios")
+```
+
+```{r}
+library(RColorBrewer)  # Para mejores colores en la escala
+
+# Cargar datos de población
+poblacion <- read_excel("poblacion_can_municipios_2021.xlsx")
+
+# Asegurar que el ID es de tipo caracter
+poblacion$id <- as.character(poblacion$id)
+
+# Unir datos geográficos con población
+poblacion_grafico <- left_join(data_muncan_mapa, poblacion, by = "id")
+
+# Definir cortes de población basados en cuartiles
+breaks <- quantile(poblacion_grafico$Poblacion, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1), na.rm = TRUE)
+
+# Crear categorías de población
+poblacion_grafico$Poblacion_cat <- cut(poblacion_grafico$Poblacion, 
+                                       breaks = breaks, 
+                                       include.lowest = TRUE, 
+                                       labels = c("Muy baja", "Baja", "Media", "Alta", "Muy alta"))
+
+# Crear el mapa con categorías de población y colores más visibles
+ggplot(poblacion_grafico) +
+  geom_sf(aes(fill = Poblacion_cat), color= "white", size = 0.2) +
+  scale_fill_manual(values = brewer.pal(5, "YlOrRd"), na.value = "gray90") +
+  labs(
+    title = "Población por Municipios",
+    subtitle = "Clasificación por niveles de población",
+    caption = "Fuente: ISTAC",
+    fill = "Nivel de Población") +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
